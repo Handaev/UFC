@@ -65,3 +65,4 @@ def basket_update(request, item_id):
         
         return redirect('basket:detail')
     return redirect('basket:detail')
+
