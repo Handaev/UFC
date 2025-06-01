@@ -72,9 +72,12 @@
             </div>
             {% endif %}
 
-            <div class="d-grid gap-2 d-md-flex">
-                <button class="btn btn-dark btn-lg me-md-2">Добавить в корзину</button>
-            </div>
+            <form action="{% url 'basket:add' product.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary add-to-basket" data-product-id="{{ product.id }}">
+                    В корзину
+                </button>
+            </form>
 
             <div class="mt-4">
                 {% if product.is_featured %}

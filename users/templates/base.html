@@ -59,7 +59,7 @@
                 {% else %}
                     <a href="{% url 'login' %}" class="text-white text-decoration-none">🔐 Вход</a>
                 {% endif %}
-                <a href="#" class="text-white text-decoration-none">🛒 Корзина</a>
+                <a href="{% url 'basket:detail' %}" class="text-white text-decoration-none">🛒 Корзина</a>
             </div>
         </div>
     </header>    
