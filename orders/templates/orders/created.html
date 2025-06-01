@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="alert alert-success">
+        <h4 class="alert-heading">Заказ успешно оформлен!</h4>
+        <p>Номер вашего заказа: <strong>{{ order.id }}</strong></p>
+        <hr>
+        <p class="mb-0">Мы свяжемся с вами в ближайшее время для подтверждения заказа.</p>
+    </div>
+    
+    <a href="{% url 'catalog:product_list' %}" class="btn btn-primary">
+        Вернуться в магазин
+    </a>
+</div>
+{% endblock %}
