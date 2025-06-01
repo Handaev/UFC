@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5>Фильтры</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="{% url 'catalog:product_list' %}">
+                    <!-- Search -->
+                    <div class="mb-3">
+                        <input type="text" class="form-control" name="search"
+                               placeholder="Поиск товаров..." value="{{ search_query }}">
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Категория</label>
+                        <select class="form-select" name="category">
+                            <option value="">Все категории</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}"
+                                    {% if selected_category == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Brand Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Бренд</label>
+                        <select class="form-select" name="brand">
+                            <option value="">Все бренды</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.id }}"
+                                    {% if selected_brand == brand.id %}selected{% endif %}>
+                                {{ brand.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Fighter Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Боец</label>
+                        <select class="form-select" name="fighter">
+                            <option value="">Все бойцы</option>
+                            {% for fighter in fighters %}
+                            <option value="{{ fighter.id }}"
+                                    {% if selected_fighter == fighter.id %}selected{% endif %}>
+                                {{ fighter.name }} {% if fighter.nickname %}"{{ fighter.nickname }}"{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Special Filters -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="featured" id="featured"
+                                   {% if is_featured %}checked{% endif %}>
+                            <label class="form-check-label" for="featured">
+                                Рекомендуемые
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="bestseller" id="bestseller"
+                                   {% if is_bestseller %}checked{% endif %}>
+                            <label class="form-check-label" for="bestseller">
+                                Хиты продаж
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="new" id="new"
+                                   {% if is_new %}checked{% endif %}>
+                            <label class="form-check-label" for="new">
+                                Новинки
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Применить</button>
+                        <a href="{% url 'catalog:product_list' %}" class="btn btn-outline-secondary">Сбросить</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products List -->
+    <div class="col-md-9">
+        <div class="row mb-4">
+            <div class="col">
+                <h2>Каталог товаров</h2>
+                {% if search_query or selected_category or selected_brand or selected_fighter or is_featured or is_bestseller or is_new %}
+                <p class="text-muted">
+                    Найдено товаров: {{ products.count }}
+                    {% if search_query %} по запросу "{{ search_query }}"{% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for product in products %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if product.images.first %}
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            {% if product.old_price %}
+                            <span class="badge bg-danger">-{{ product.get_discount_percent }}%</span>
+                            {% endif %}
+                        </div>
+
+                        {% if product.fighters.all %}
+                        <div class="mb-2">
+                            {% for fighter in product.fighters.all %}
+                            <span class="badge champion-badge">
+                                {{ fighter.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="card-text mb-0">
+                                    <strong>{{ product.price }} ₽</strong>
+                                    {% if product.old_price %}
+                                    <small class="text-muted text-decoration-line-through ms-2">{{ product.old_price }} ₽</small>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div>
+                                {% if product.is_featured %}
+                                <span class="badge bg-info">Рекомендуем</span>
+                                {% endif %}
+                                {% if product.is_bestseller %}
+                                <span class="badge bg-warning text-dark">Хит</span>
+                                {% endif %}
+                                {% if product.is_new %}
+                                <span class="badge bg-success">Новинка</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-dark w-100">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">Товары не найдены. Попробуйте изменить параметры поиска.</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

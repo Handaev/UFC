@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Product Images Carousel -->
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for image in product.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ product.name }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h1>{{ product.name }}</h1>
+            <p class="text-muted">Артикул: {{ product.sku }}</p>
+
+            <div class="d-flex align-items-center mb-3">
+                <h3 class="mb-0">{{ product.price }} ₽</h3>
+                {% if product.old_price %}
+                <span class="text-muted text-decoration-line-through ms-3">{{ product.old_price }} ₽</span>
+                <span class="badge bg-danger ms-2">-{{ product.get_discount_percent }}%</span>
+                {% endif %}
+            </div>
+
+            {% if product.fighters.all %}
+            <div class="mb-3">
+                <h5>Связанные бойцы:</h5>
+                {% for fighter in product.fighters.all %}
+                <span class="badge champion-badge me-2">
+                    {{ fighter.name }} {% if fighter.nickname %}"{{ fighter.nickname }}"{% endif %}
+                </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if product.brand %}
+            <div class="mb-3">
+                <h5>Бренд:</h5>
+                <p>{{ product.brand.name }}</p>
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <h5>Описание:</h5>
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+
+            {% if product.sizes.all %}
+            <div class="mb-3">
+                <h5>Доступные размеры:</h5>
+                <div class="btn-group" role="group">
+                    {% for size in product.sizes.all %}
+                    <button type="button" class="btn btn-outline-dark {% if size.stock == 0 %}disabled{% endif %}">
+                        {{ size.size }} {% if size.stock == 0 %}(Нет в наличии){% endif %}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="d-grid gap-2 d-md-flex">
+                <button class="btn btn-dark btn-lg me-md-2">Добавить в корзину</button>
+            </div>
+
+            <div class="mt-4">
+                {% if product.is_featured %}
+                <span class="badge bg-info me-2">Рекомендуем</span>
+                {% endif %}
+                {% if product.is_bestseller %}
+                <span class="badge bg-warning text-dark me-2">Хит продаж</span>
+                {% endif %}
+                {% if product.is_new %}
+                <span class="badge bg-success">Новинка</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>Похожие товары</h3>
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+                {% for product in related_products %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">
+                                <strong>{{ product.price }} ₽</strong>
+                                {% if product.old_price %}
+                                <small class="text-muted text-decoration-line-through ms-2">{{ product.old_price }} ₽</small>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <a href="{% url 'catalog:product_detail' product.pk %}" class="btn btn-dark w-100">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

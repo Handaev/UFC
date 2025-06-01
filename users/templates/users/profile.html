@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">👤 Профиль пользователя</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Имя пользователя</label>
+                            {{ form.username }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Имя</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Фамилия</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        
+                        {% if user.is_superuser or user.is_manager %}
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.is_fighter }}
+                                <label class="form-check-label">Боец</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                {{ form.is_manager }}
+                                <label class="form-check-label">Менеджер</label>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                            <a href="{% url 'home' %}" class="btn btn-secondary">На главную</a>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'password_change' %}" class="btn btn-outline-warning">
+                            Сменить пароль
+                        </a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                            Выйти из аккаунта
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

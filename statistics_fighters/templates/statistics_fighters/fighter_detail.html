@@ -1,0 +1,136 @@
+<!-- statistics_fighters/templates/statistics_fighters/fighter_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if fighter.image_url %}
+                <img src="{{ fighter.image_url }}" class="card-img-top" alt="{{ fighter.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h2 class="card-title">{{ fighter.name }}</h2>
+                    {% if fighter.nickname %}
+                    <h4 class="text-muted">"{{ fighter.nickname }}"</h4>
+                    {% endif %}
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        {% if fighter.country_flag_url %}
+                        <img src="{{ fighter.country_flag_url }}" alt="{{ fighter.country }}" 
+                             class="me-2" style="width: 32px; height: 21px;">
+                        {% endif %}
+                        <span class="fs-5">{{ fighter.country }}</span>
+                    </div>
+                    
+                    {% if fighter.is_champion %}
+                    <div class="alert alert-warning mb-3">
+                        <strong>Чемпион UFC - {{ fighter.weight_category.name }}</strong>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-secondary mb-3">
+                        <strong>#{{ fighter.ranking }} в рейтинге {{ fighter.weight_category.name }}</strong>
+                    </div>
+                    {% endif %}
+                    
+                    <a href="{% url 'statistics_fighters:fighter_ranking' %}" class="btn btn-dark">
+                        ← Назад к рейтингу
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Статистика -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Статистика</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Весовая категория
+                                    <span class="badge bg-primary rounded-pill">{{ fighter.weight_category.name }}</span>
+                                </li>
+                                {% if fighter.age %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Возраст
+                                    <span>{{ fighter.age }} лет</span>
+                                </li>
+                                {% endif %}
+                                {% if fighter.height %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Рост
+                                    <span>{{ fighter.height }}</span>
+                                </li>
+                                {% endif %}
+                                {% if fighter.weight %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Вес
+                                    <span>{{ fighter.weight }}</span>
+                                </li>
+                                {% endif %}
+                                {% if fighter.reach %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Размах рук
+                                    <span>{{ fighter.reach }}</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                {% if fighter.record %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Рекорд
+                                    <span class="badge bg-success">{{ fighter.record }}</span>
+                                </li>
+                                {% endif %}
+                                {% if fighter.strikes_landed_per_min %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Ударов в минуту
+                                    <span>{{ fighter.strikes_landed_per_min }}</span>
+                                </li>
+                                {% endif %}
+                                {% if fighter.strike_accuracy %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Точность ударов
+                                    <span>{{ fighter.strike_accuracy }}%</span>
+                                </li>
+                                {% endif %}
+                                {% if fighter.takedown_avg %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Тејкдаунов в среднем
+                                    <span>{{ fighter.takedown_avg }}</span>
+                                </li>
+                                {% endif %}
+                                {% if fighter.submission_avg %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Сабмишенов в среднем
+                                    <span>{{ fighter.submission_avg }}</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Биография -->
+            {% if fighter.bio %}
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Биография</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ fighter.bio }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
