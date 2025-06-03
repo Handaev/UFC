@@ -55,6 +55,9 @@
             <div class="d-flex gap-3">
                 {% if user.is_authenticated %}
                     <a href="{% url 'profile' %}" class="text-white text-decoration-none">👤 Профиль</a>
+                    <a class="btn btn-outline-light ms-2" href="{% url 'orders:list' %}">
+                        <i class="bi bi-list-check"></i> Мои заказы
+                    </a>
                     <a href="{% url 'logout' %}" class="text-white text-decoration-none">🚪 Выйти</a>
                 {% else %}
                     <a href="{% url 'login' %}" class="text-white text-decoration-none">🔐 Вход</a>

@@ -10,6 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')), 
      path('basket/', include('basket.urls')), # подключаем маршруты users
+     path('orders/', include('orders.urls')),
     path('', home_view, name='home'),
     path('fighters/', include('statistics_fighters.urls', namespace='statistics_fighters')),
     path('catalog/', include('catalog_product.urls', namespace='catalog')),

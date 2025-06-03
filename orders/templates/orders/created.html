@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Заказ оформлен</h1>
+    <p>Ваш заказ №{{ order.id }} успешно создан.</p>
+    <p>Статус заказа: {{ order.get_status_display }}</p>
+    <p>Способ оплаты: {{ order.get_payment_method_display }}</p>
+    <p>Общая сумма: {{ order.total_price|floatformat:2 }} руб.</p>
+{% endblock %}
