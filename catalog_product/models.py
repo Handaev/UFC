@@ -3,6 +3,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
 from django.urls import reverse
+from simple_history.models import HistoricalRecords
 
 
 class Category(models.Model):
@@ -11,6 +12,7 @@ class Category(models.Model):
     description = models.TextField('Описание', blank=True)
     image = models.ImageField('Изображение', upload_to='categories/', blank=True)
     is_active = models.BooleanField('Активна', default=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = 'Категория'
@@ -21,13 +23,13 @@ class Category(models.Model):
         return self.name
 
 
-
 class Brand(models.Model):
     """Бренд UFC или связанный с MMA"""
     name = models.CharField('Название', max_length=100, unique=True)
     description = models.TextField('Описание', blank=True)
     logo = models.ImageField('Логотип', upload_to='brands/', blank=True)
     is_active = models.BooleanField('Активен', default=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = 'Бренд'
@@ -36,7 +38,6 @@ class Brand(models.Model):
 
     def __str__(self):
         return self.name
-
 
 
 class Fighter(models.Model):
@@ -55,7 +56,6 @@ class Fighter(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.nickname})" if self.nickname else self.name
-
 
 
 class Product(models.Model):
@@ -98,6 +98,7 @@ class Product(models.Model):
     is_active = models.BooleanField('Активен', default=True)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = 'Товар'

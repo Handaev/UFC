@@ -2,6 +2,13 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from .models import Product, Category, Brand, Fighter
 
+from .serializers import CategorySerializer, BrandSerializer, FighterSerializer, ProductSerializer
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import ProductFilter
+from rest_framework.decorators import action
+
 
 def product_list(request):
     products = Product.objects.filter(is_active=True)
@@ -68,3 +75,55 @@ def product_detail(request, pk):
         'related_products': related_products,
     }
     return render(request, 'products/product_detail.html', context)
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class BrandViewSet(viewsets.ModelViewSet):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class FighterViewSet(viewsets.ModelViewSet):
+    queryset = Fighter.objects.all()
+    serializer_class = FighterSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.prefetch_related('images', 'sizes', 'fighters')
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = ProductFilter
+
+    # Поиск по названию или краткому описанию
+    search_fields = ['name', 'short_description']
+
+    @action(methods=['GET'], detail=False)
+    def new_products(self, request):
+        """Вернуть список новинок"""
+        new_items = self.queryset.filter(is_new=True)
+        page = self.paginate_queryset(new_items)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(new_items, many=True)
+        return Response(serializer.data)
+
+    @action(methods=['POST'], detail=True)
+    def mark_featured(self, request, pk=None):
+        """Пометить товар как рекомендуемый"""
+        product = self.get_object()
+        product.is_featured = True
+        product.save()
+        return Response({'status': f'Товар {product.name} отмечен как рекомендуемый'})

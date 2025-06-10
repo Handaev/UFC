@@ -1,10 +1,36 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from import_export import resources, fields
+from django.utils.html import strip_tags
+from import_export.admin import ExportMixin
 from .models import (
     Category, Brand, Fighter,
     Product, ProductImage,
     ProductSize
 )
+
+
+
+class ProductResource(resources.ModelResource):
+    # Вычисляемое поле
+    discount_percent = fields.Field(column_name='Скидка (%)')
+
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'price', 'old_price', 'discount_percent', 'category__name', 'brand__name')
+        export_order = ('id', 'name', 'price', 'old_price', 'discount_percent', 'category__name', 'brand__name')
+
+    # ✅ Метод 1: вычисляемое поле
+    def get_discount_percent(self, obj):
+        return obj.get_discount_percent()
+
+    # ✅ Метод 2: деформация поля description (например, убираем HTML)
+    def dehydrate_description(self, obj):
+        return strip_tags(obj.description)[:100]  # Ограничим 100 символами
+
+    # ✅ Метод 3: фильтрация queryset при экспорте (например, только активные товары)
+    def get_export_queryset(self, request):
+        return super().get_export_queryset(request).filter(is_active=True)
 
 
 class ProductImageInline(admin.TabularInline):
@@ -80,7 +106,7 @@ class FighterAdmin(admin.ModelAdmin):
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ExportMixin, admin.ModelAdmin):
     list_display = (
         'name', 'sku', 'price', 'old_price',
         'category', 'brand', 'is_active',
@@ -90,6 +116,7 @@ class ProductAdmin(admin.ModelAdmin):
         'category', 'brand', 'is_active',
         'is_featured', 'is_bestseller', 'is_new'
     )
+    resource_class = ProductResource
     search_fields = ('name', 'sku', 'description')
     filter_horizontal = ('fighters',)
     readonly_fields = ('created_at', 'updated_at', 'discount_percent')
